@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import LinearRegression
 
+
 class IntervalStrategyHeavy:
     def __init__(self):
         self.linreg = LinearRegression()
@@ -13,6 +14,7 @@ class IntervalStrategyHeavy:
         self.bound_intercepts = ()
 
         self.data = pd.Series()
+        self.earliest_date = pd.Timestamp("1")
         self.time_step = pd.Timedelta("1")
 
     def fit(self, data, main_borders_quantiles=None, inner_bounds_num=None, broker_commission=0.003):
@@ -27,6 +29,7 @@ class IntervalStrategyHeavy:
             main_borders_quantiles = np.array([0.01, 0.1, 0.9, 0.99])
 
         data = data.sort_index()
+        self.earliest_date = data.index[0]
         self.time_step = (data.index[1:] - data.index[:-1]).min()
         data_index = pd.date_range(data.index.min(), data.index.max(), freq=self.time_step)
         self.data = pd.Series(0, index=data_index)
@@ -48,7 +51,7 @@ class IntervalStrategyHeavy:
                                broker_commission)
         return self
 
-    def trade(self,current_values, fund, buyer, seller,
+    def trade(self, current_values, fund, buyer, seller,
               auto_fit=True, diversification=(0.5, 0.5), missing_data=None, current_date=None):
         """ A method for a one-time buy or sell.
 
@@ -63,18 +66,7 @@ class IntervalStrategyHeavy:
         """
         ...
 
-    def add_data(self, missing_data):
-        missing_data = missing_data[missing_data.index > self.data.index[-1]].sort_index()
-        if not missing_data.empty:
-            if not self._is_matching_step(missing_data):
-                raise ValueError(
-                    f"A step equal to {self.time_step} is not observed for the missing_data argument."
-                )
-            self.data = pd.concat([self.data, missing_data])
-            return True
-        return False
-
-    def solve(self, current_values,
+    def solve(self, current_values, diversification=(0.5, 0.5),
               missing_data=None, current_date=None):
         """Trade only on the main borders
 
@@ -92,6 +84,29 @@ class IntervalStrategyHeavy:
                     f"The current_date argument can only have values {self.data.index[-1]} and {next_date}."
                 )
             self.data[current_date] = current_values.mean()
+
+        diversification = pd.Series(0, index=diversification)
+        if diversification.index.sum() != 1:
+            raise ValueError(
+                "The elements of the diversification argument must be equal to one in total."
+            )
+
+    def add_data(self, missing_data):
+        missing_data = missing_data[missing_data.index > self.data.index[-1]].sort_index()
+        if not missing_data.empty:
+            if not self._is_matching_step(missing_data):
+                raise ValueError(
+                    f"A step equal to {self.time_step} is not observed for the missing_data argument."
+                )
+            self.data = pd.concat([self.data, missing_data])
+            return True
+        return False
+
+    def get_last_date(self):
+        return self.data.iloc[-1]
+
+    # def set_params(self):
+    #     pass
 
     def _set_inner_bounds(self, series_without_trend, main_borders_quantiles, inner_bounds_num, broker_commission):
         if inner_bounds_num is None:
