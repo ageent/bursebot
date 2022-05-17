@@ -1,0 +1,8 @@
+.auth__form-button {
+    width: 180px;
+    border: none;
+    background-color: black;
+    color: white;
+    font-size: 24px;
+    padding: 0;
+}

@@ -1,0 +1,5 @@
+.table__button-container {
+    display: flex;
+    width: 60%;
+    justify-content: space-between;
+}

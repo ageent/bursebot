@@ -1,0 +1,11 @@
+.table__button {
+    width: 150px;
+    height: 40px;
+    border: none;
+    color: white;
+    text-align: center;
+    background-color: #3E97D1;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0;
+}
