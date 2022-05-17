@@ -1,7 +1,7 @@
 import React from 'react';
 import account from '../images/account.png';
 import github from '../images/github.png';
-
+import PopupWithForm from './PopupWithForm';
 
 function Main() {
     return (
@@ -74,6 +74,8 @@ function Main() {
                         </div>
                     </div>
                 </section>
+
+                
             </main >
         </>
 
