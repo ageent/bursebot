@@ -1,0 +1,10 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    font-family: Inter, sans-serif;
+
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+    
+}
