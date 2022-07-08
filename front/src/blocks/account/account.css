@@ -1,0 +1,8 @@
+.account {
+    display: flex;
+    width: 880px;
+    background-color: #F1F1F1;
+    margin: 0 0 60px;
+    padding: 40px;
+    box-sizing: border-box;
+}
